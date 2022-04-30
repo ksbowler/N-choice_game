@@ -107,7 +107,7 @@ contract choices {
         T_S = block.timestamp;
     }
 
-    function inputHashValue(uint256 hashValue) public {
+    function generateHashValue(uint256 hashValue) public {
         require(participants[msg.sender],"You are not participants");
         require(T_S <= block.timestamp && block.timestamp < T_S+T_V,"Now is not inputHashValue time");
         hash_value[msg.sender] = hashValue;
