@@ -17,13 +17,9 @@ contract choices {
     }
 
     mapping (address => bool) participants; 
-    //address payable[] participants_vector; // 可変長 
     uint m = 0; 
     mapping (address => uint256) choice_value; 
     mapping (address => uint256) hash_value;
-    //mapping (address => bool) isPaidDeposit;
-    mapping (address => uint256) earn_money; //will delete
-    //address payable[16] participants_vector_memory;
     mapping (uint256 => address payable) participants_mapping;
     uint Ts; 
     uint Tv; 
@@ -114,7 +110,6 @@ contract choices {
             return;
 
         } else if(state == 4){
-            //state = 255;
             return;
         } else if(state == 5) {
             return;
@@ -143,22 +138,15 @@ contract choices {
     }
 
     function setParameter() internal {
-        //参加ノード数が確定している
-        //参加報酬が確定
         Rp = uint(Ra/M);
 
-        //選択肢数が確定
         uint M_size = getSize(M-1);
         N = 1 << M_size;
         log2N = M_size;
 
-        //NCG得点単価が確定
         Rg = uint((D + Rp)/max(N-1,M-1));
         require(D+Rp >= Rg*max(N-1,M-1), "Error: big Rg");
         require(Rg*min(N-1,M-1) > Rp, "Error: small Rg");
-        // for(uint i=0;i<M;i++){
-        //     participants_vector_memory[i] = participants_vector[i];
-        // }
         
     }
 
