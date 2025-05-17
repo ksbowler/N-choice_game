@@ -11,6 +11,7 @@ contract choices {
     uint M; 
     uint N; 
     uint log2N;
+    bool is_need_deposit = false;
     
     constructor() payable{
         owner = payable(msg.sender);
@@ -21,6 +22,7 @@ contract choices {
     mapping (address => uint256) choice_value; 
     mapping (address => uint256) hash_value;
     mapping (uint256 => address payable) participants_mapping;
+    mapping (address => uint256) earn_money;
     uint Ts; 
     uint Tv; 
     uint Tp;
@@ -49,7 +51,7 @@ contract choices {
     }
     
     
-    function preparationOwner(uint _m, uint _Tv, uint _Tp) payable public{
+    function preparationOwner(uint _m, uint _Tv, uint _Tp, bool _is_need_deposit) payable public{
         require(msg.sender == owner, "You are not owner");
         require(_m >= 2,"Small m");
         require(state >= 5, "NCG can not start now");
@@ -59,9 +61,15 @@ contract choices {
 
         Tv = _Tv;
         Tp = _Tp;
+        is_need_deposit = _is_need_deposit;
 
-        Ra = msg.value;
-        D = uint(Ra/m);
+        if (is_need_deposit) {
+            Ra = msg.value;
+            D = uint(Ra/m);
+        } else {
+            Ra = 0;
+            D = 0;
+        }
 
         isEnoughParticipants = false;
         state = 255;
@@ -138,15 +146,23 @@ contract choices {
     }
 
     function setParameter() internal {
-        Rp = uint(Ra/M);
-
-        uint M_size = getSize(M-1);
-        N = 1 << M_size;
-        log2N = M_size;
-
-        Rg = uint((D + Rp)/max(N-1,M-1));
-        require(D+Rp >= Rg*max(N-1,M-1), "Error: big Rg");
-        require(Rg*min(N-1,M-1) > Rp, "Error: small Rg");
+        if (is_need_deposit) {
+            Rp = uint(Ra/M);
+    
+            uint M_size = getSize(M-1);
+            N = 1 << M_size;
+            log2N = M_size;
+    
+            Rg = uint((D + Rp)/max(N-1,M-1));
+            require(D+Rp >= Rg*max(N-1,M-1), "Error: big Rg");
+            require(Rg*min(N-1,M-1) > Rp, "Error: small Rg");
+        } else {
+            uint M_size = getSize(M-1);
+            N = 1 << M_size;
+            log2N = M_size;
+            Rg = uint(Rp/max(N-1,M-1));
+            require(Rp >= Rg*max(N-1,M-1), "Error: big Rg");
+        }
         
     }
 
